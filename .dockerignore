@@ -1,0 +1,5 @@
+evently_web
+vendor
+node_modules
+.env
+storage/logs
