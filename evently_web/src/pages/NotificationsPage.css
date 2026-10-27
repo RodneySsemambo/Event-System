@@ -1,0 +1,53 @@
+.notif-page__loading { color: var(--color-ink-muted); padding: 40px 0; text-align: center; }
+
+.notif-page__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.notif-page__item {
+  display: flex;
+  gap: 14px;
+  padding: 18px 20px;
+  background: white;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.notif-page__item:hover {
+  border-color: var(--color-gold);
+  transform: translateY(-1px);
+}
+
+.notif-page__item--unread { border-left: 3px solid var(--color-gold); }
+
+.notif-page__dot {
+  flex: 0 0 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  margin-top: 8px;
+  opacity: 0;
+}
+.notif-page__item--unread .notif-page__dot { opacity: 1; }
+
+.notif-page__body { flex: 1; min-width: 0; }
+
+.notif-page__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin: 0 0 4px;
+}
+
+.notif-page__time {
+  font-size: 12.5px;
+  color: var(--color-ink-muted);
+  margin: 0;
+}

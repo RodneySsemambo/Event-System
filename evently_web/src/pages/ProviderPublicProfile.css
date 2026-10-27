@@ -1,0 +1,252 @@
+.profile__loading { text-align: center; color: var(--color-ink-muted); padding: 60px 0; }
+
+.profile__back {
+  display: inline-block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-ink-muted);
+  text-decoration: none;
+  margin-bottom: 24px;
+  transition: color 0.2s ease;
+}
+.profile__back:hover { color: var(--color-gold); }
+
+.profile__banner {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 32px;
+  aspect-ratio: 16 / 5;
+  background: var(--color-ivory-dim);
+}
+.profile__banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.profile__header { display: flex; gap: 28px; align-items: flex-start; margin-bottom: 32px; }
+
+/* Portfolio Gallery */
+.portfolio-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.portfolio-gallery__main {
+  width: 100%;
+  aspect-ratio: 16 / 9; /* Jiji usually uses a wide aspect ratio */
+  background: var(--color-plum-deep);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+}
+
+.portfolio-gallery__main img,
+.portfolio-gallery__main video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* 'contain' shows the whole image, 'cover' crops it. Jiji uses contain. */
+  display: block;
+}
+
+.portfolio-gallery__caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Thumbnails */
+.portfolio-gallery__thumbs {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.portfolio-gallery__thumbs::-webkit-scrollbar {
+  height: 6px;
+}
+.portfolio-gallery__thumbs::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 999px;
+}
+
+.portfolio-thumb {
+  flex: 0 0 80px;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  background: var(--color-ivory-dim);
+  position: relative;
+}
+
+.portfolio-thumb img,
+.portfolio-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.portfolio-thumb--active {
+  border-color: var(--color-gold);
+}
+
+.portfolio-thumb__video {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #000;
+}
+
+.portfolio-thumb__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.profile__photo {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--color-plum);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid white;
+  box-shadow: 0 8px 24px rgba(23,13,25,0.12);
+}
+.profile__photo img { width: 100%; height: 100%; object-fit: cover; }
+.profile__photo-placeholder {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 600;
+  color: var(--color-gold);
+}
+
+.profile__head-info { flex: 1; min-width: 0; }
+
+.profile__category {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-berry);
+  margin: 0 0 8px;
+}
+
+.profile__name { font-size: clamp(28px, 3.6vw, 40px); margin: 0 0 12px; }
+
+.profile__meta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+.profile__rating { font-size: 15px; font-weight: 600; color: var(--color-gold); }
+.profile__rating-count { color: var(--color-ink-muted); font-weight: 400; }
+.profile__rating--empty { color: var(--color-ink-muted); font-weight: 500; }
+
+.profile__availability {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+.profile__availability--available   { background: rgba(43,115,81,0.12); color: #2b7351; }
+.profile__availability--busy        { background: rgba(201,162,39,0.15); color: #8a6d10; }
+.profile__availability--unavailable { background: rgba(181,73,91,0.12); color: var(--color-berry); }
+
+.profile__price-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background: var(--color-plum);
+  color: var(--color-ivory);
+  border-radius: var(--radius-md);
+  margin-bottom: 32px;
+}
+.profile__price-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-gold-soft);
+}
+.profile__price-value { font-family: var(--font-display); font-size: 22px; font-weight: 600; }
+
+.profile__section { margin-bottom: 48px; }
+.profile__section-title { font-size: 22px; margin: 0 0 20px; }
+.profile__bio { font-size: 16px; line-height: 1.7; color: var(--color-ink); margin: 0; }
+
+.profile__actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; }
+
+.profile__booking-wrap {
+  background: white;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  margin-bottom: 40px;
+}
+
+.profile__portfolio {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+.profile__portfolio-item {
+  margin: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: white;
+  border: 1px solid var(--color-line);
+}
+.profile__portfolio-item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+.profile__portfolio-item figcaption {
+  font-size: 12.5px;
+  color: var(--color-ink-muted);
+  padding: 10px 12px;
+}
+
+.profile__empty { color: var(--color-ink-muted); font-size: 15px; margin: 0; }
+
+.profile__reviews { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 20px; }
+
+.review {
+  background: white;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+}
+.review__head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+.review__stars { color: var(--color-gold); font-size: 14px; letter-spacing: 1px; }
+.review__stars-dim { color: var(--color-line); }
+.review__author { font-size: 14px; font-weight: 600; color: var(--color-ink); }
+.review__body { font-size: 15px; color: var(--color-ink); line-height: 1.6; margin: 0; }
+
+@media (max-width: 640px) {
+  .profile__header { gap: 18px; }
+  .profile__photo { flex-basis: 72px; width: 72px; height: 72px; }
+  .profile__photo-placeholder { font-size: 30px; }
+}
+
+.profile__portfolio-item video {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  background: #000;
+}

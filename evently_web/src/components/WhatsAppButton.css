@@ -1,0 +1,16 @@
+.wa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px 22px;
+  border-radius: var(--radius-sm);
+  background: #25D366;
+  color: white;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+.wa-btn:hover { background: #1EBE57; }
+.wa-btn__icon { flex-shrink: 0; }

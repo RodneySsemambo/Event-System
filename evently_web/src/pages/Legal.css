@@ -1,0 +1,65 @@
+.legal {
+  min-height: 100vh;
+  background: var(--color-ivory);
+  padding: 140px 32px 80px;
+}
+
+.legal__inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.legal__eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-berry);
+  margin: 0 0 12px;
+}
+
+.legal__title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 4vw, 48px);
+  margin: 0 0 20px;
+}
+
+.legal__lede {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--color-ink-muted);
+  margin: 0 0 56px;
+}
+
+.legal__section {
+  margin-bottom: 56px;
+  scroll-margin-top: 120px;
+}
+
+.legal__section h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  margin: 0 0 16px;
+}
+
+.legal__section p {
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--color-ink);
+  margin: 0 0 16px;
+}
+
+.legal__section a {
+  color: var(--color-berry);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.legal__section a:hover { border-bottom-color: var(--color-berry); }
+
+.legal__back { padding-top: 20px; border-top: 1px solid var(--color-line); }
+
+@media (max-width: 640px) {
+  .legal { padding: 110px 20px 60px; }
+  .legal__section p { font-size: 15.5px; }
+}

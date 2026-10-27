@@ -1,0 +1,149 @@
+/* Shared inner-page UI primitives. Import once, after theme.css. */
+
+.ui-page {
+  min-height: 100vh;
+  background: var(--color-ivory);
+  padding: 120px 32px 80px;
+}
+
+.ui-container { max-width: var(--content-max); margin: 0 auto; }
+.ui-container--narrow { max-width: 760px; margin: 0 auto; }
+.ui-container--form { max-width: 640px; margin: 0 auto; }
+
+.ui-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.ui-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-berry);
+  margin: 0 0 8px;
+}
+
+.ui-title { font-size: clamp(28px, 3.4vw, 40px); margin: 0 0 8px; }
+
+.ui-sub {
+  font-size: 15.5px;
+  color: var(--color-ink-muted);
+  margin: 0;
+  max-width: 520px;
+  line-height: 1.55;
+}
+
+/* Buttons */
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px 22px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.ui-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.ui-btn--primary { background: var(--color-gold); color: var(--color-plum-deep); }
+.ui-btn--primary:hover:not(:disabled) { background: var(--color-gold-soft); }
+
+.ui-btn--ghost { background: transparent; border-color: var(--color-line); color: var(--color-ink); }
+.ui-btn--ghost:hover:not(:disabled) { border-color: var(--color-gold); color: var(--color-gold); }
+
+.ui-btn--danger { background: transparent; border-color: rgba(181,73,91,0.35); color: var(--color-berry); }
+.ui-btn--danger:hover:not(:disabled) { background: rgba(181,73,91,0.08); border-color: var(--color-berry); }
+
+.ui-btn--sm { padding: 7px 14px; font-size: 13px; }
+
+/* Card */
+.ui-card { background: white; border: 1px solid var(--color-line); border-radius: var(--radius-md); padding: 24px; }
+
+/* Field */
+.ui-field { display: block; margin-bottom: 18px; }
+
+.ui-field__label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin-bottom: 6px;
+}
+
+.ui-field__input,
+.ui-field__select,
+.ui-field__textarea {
+  display: block;
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--color-ink);
+  background: white;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ui-field__textarea { resize: vertical; min-height: 100px; }
+
+.ui-field__input:focus,
+.ui-field__select:focus,
+.ui-field__textarea:focus {
+  outline: none;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(201,162,39,0.15);
+}
+
+.ui-field__error { font-size: 13px; color: var(--color-berry); margin: 6px 0 0; }
+.ui-field__hint  { font-size: 12.5px; color: var(--color-ink-muted); margin: 6px 0 0; }
+
+/* Alert */
+.ui-alert {
+  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+  border-left: 3px solid;
+}
+.ui-alert--error   { background: rgba(181,73,91,0.08); border-color: var(--color-berry); color: var(--color-berry); }
+.ui-alert--success { background: rgba(43,115,81,0.08); border-color: #2b7351; color: #2b7351; }
+
+/* Empty state */
+.ui-empty { text-align: center; padding: 64px 24px; color: var(--color-ink-muted); font-size: 15px; }
+.ui-empty__title { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--color-ink); margin: 0 0 8px; }
+.ui-empty__text  { margin: 0 0 20px; }
+
+/* Badges */
+.ui-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.ui-badge--pending   { background: rgba(201,162,39,0.15); color: #8a6d10; }
+.ui-badge--accepted  { background: rgba(43,115,81,0.12);  color: #2b7351; }
+.ui-badge--declined  { background: rgba(181,73,91,0.12);  color: var(--color-berry); }
+.ui-badge--cancelled { background: rgba(36,21,40,0.08);   color: var(--color-ink-muted); }
+.ui-badge--completed { background: rgba(36,21,40,0.10);   color: var(--color-plum); }
+
+@media (max-width: 700px) {
+  .ui-page { padding: 100px 20px 60px; }
+}
