@@ -1,6 +1,11 @@
 # Build stage
 FROM composer:2.7 AS vendor
 WORKDIR /app
+
+# Install required PHP extensions for Composer to resolve dependencies
+RUN apk add --no-cache icu-dev libzip-dev bzip2-dev libsodium-dev \
+    && docker-php-ext-install intl zip bz2 sodium
+
 COPY database/ database/
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-interaction --no-plugins --no-scripts --prefer-dist
@@ -9,8 +14,8 @@ RUN composer install --no-dev --no-interaction --no-plugins --no-scripts --prefe
 FROM php:8.3-fpm-alpine
 
 # Install system dependencies and PHP extensions
-RUN apk add --no-cache nginx supervisor curl \
-    && docker-php-ext-install pdo pdo_mysql bcmath opcache
+RUN apk add --no-cache nginx supervisor curl icu-dev libzip-dev bzip2-dev libsodium-dev \
+    && docker-php-ext-install pdo pdo_mysql bcmath opcache intl zip bz2 sodium
 
 # Set working directory
 WORKDIR /var/www/html
