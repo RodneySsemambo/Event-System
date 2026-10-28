@@ -16,8 +16,7 @@
         "laravel/socialite": "*",
         "laravel/tinker": "^3.0",
         "marzpay/php-sdk": "^1.0",
-        "nile-squad/nylonpay-php": "^0.3.0",
-        "vincenzoraco/turnstile-for-laravel": "*"
+        "nile-squad/nylonpay-php": "^0.3.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
