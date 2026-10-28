@@ -8,9 +8,6 @@ RUN apk add --no-cache icu-dev libzip-dev bzip2-dev libsodium-dev \
 
 COPY database/ database/
 COPY composer.json composer.lock ./
-# Build stage
-WORKDIR /app
-
 # ... (extension install lines) ...
 
 # Force Git to use HTTPS instead of SSH for GitHub
