@@ -21,3 +21,14 @@ php /var/www/html/artisan view:cache
 
 echo "Starting services..."
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+
+echo "Running database migrations..."
+php /var/www/html/artisan migrate --force
+
+echo "Seeding database..."
+php /var/www/html/artisan db:seed --force
+
+echo "Caching configuration..."
+php /var/www/html/artisan config:cache
+php /var/www/html/artisan route:cache
+php /var/www/html/artisan view:cache
