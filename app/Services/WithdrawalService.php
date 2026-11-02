@@ -7,24 +7,20 @@ use App\Models\Withdrawal;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use function NileSquad\NylonPay\createNylonPay;
+use MarzPay\Exceptions\MarzPayException;
+use MarzPay\Laravel\Facades\MarzPay;
 
 class WithdrawalService
 {
-    public const MINIMUM = 100;
+    public const MINIMUM = 1000;
 
     public function balance(ProviderProfile $provider): array
     {
-        $earned = (float) $provider->bookings()
-            ->where('status', 'completed')
-            ->sum('provider_payout');
-
-        $withdrawn = (float) $provider->withdrawals()
-            ->whereIn('status', ['pending', 'processing', 'successful'])
-            ->sum('amount');
+        $earned = (float) $provider->bookings()->where('status', 'completed')->sum('provider_payout');
+        $withdrawn = (float) $provider->withdrawals()->whereIn('status', ['pending', 'processing', 'successful'])->sum('amount');
 
         return [
-            'earned'    => $earned,
+            'earned' => $earned,
             'withdrawn' => $withdrawn,
             'available' => max(0, $earned - $withdrawn),
         ];
@@ -33,83 +29,50 @@ class WithdrawalService
     public function request(ProviderProfile $provider, float $amount, string $phoneNumber): Withdrawal
     {
         if ($amount < self::MINIMUM) {
-            throw ValidationException::withMessages([
-                'amount' => ['Minimum withdrawal is UGX ' . number_format(self::MINIMUM) . '.'],
-            ]);
+            throw ValidationException::withMessages(['amount' => ['Minimum withdrawal is UGX ' . number_format(self::MINIMUM)]]);
         }
 
         $balance = $this->balance($provider);
-
         if ($amount > $balance['available']) {
-            throw ValidationException::withMessages([
-                'amount' => ['You can only withdraw up to UGX ' . number_format($balance['available']) . '.'],
-            ]);
+            throw ValidationException::withMessages(['amount' => ['You can only withdraw up to UGX ' . number_format($balance['available'])]]);
         }
 
-        // Nylon Pay requires a 13-15 character reference
-        $reference = (string) Str::random();
+        $reference = (string) Str::uuid();
 
         $withdrawal = Withdrawal::create([
             'provider_profile_id' => $provider->id,
-            'amount'              => $amount,
-            'phone_number'        => $phoneNumber,
-            'status'              => 'pending',
-            'marzpay_reference'   => $reference,
+            'amount' => $amount,
+            'phone_number' => $phoneNumber,
+            'status' => 'pending',
+            'marzpay_reference' => $reference,
         ]);
 
         try {
-            $nylon = createNylonPay([
-                'apiKey'    => config('services.nylonpay.api_key'),
-                'apiSecret' => config('services.nylonpay.api_secret'),
-                'baseUrl'   => config('services.nylonpay.base_url'),
+            $response = MarzPay::disbursements()->sendMoney([
+                'phone_number' => $phoneNumber,
+                'amount'       => $amount,
+                'country'      => 'UG',
+                'description'  => "Evently payout #{$withdrawal->id}",
+                'reference'    => $reference,
             ]);
 
-            $payout = $nylon->makePayout([
-                'amount'      => (int) $amount,
-                'currency'    => 'UGX',
-                'customer'    => [
-                    'name'        => $provider->user->name,
-                    'phoneNumber' => $phoneNumber,
-                ],
-                'destination' => [
-                    'account_holder_name' => $provider->user->name,
-                    'account_number'      => $phoneNumber,
-                ],
-                'description' => "Evently payout #{$withdrawal->id}",
-                'reference'   => $reference,
-
-            ]);
+            $marzRef = $response['data']['transaction']['reference'] ?? $reference;
 
             $withdrawal->update([
-                'marzpay_uuid' => $payout->getId(),
-                'status'       => 'processing',
-                'raw_payload'  => (array) $payout,
-            ]);
-        } catch (\Throwable $e) {
-            Log::error('Withdrawal failed', [
-                'withdrawal_id' => $withdrawal->id,
-                'amount'        => $amount,
-                'phone'         => $phoneNumber,
-                'message'       => $e->getMessage(),
+                'marzpay_reference' => $marzRef,
+                'status'            => 'processing',
             ]);
 
-            $withdrawal->update([
-                'status'         => 'failed',
-                'failure_reason' => $e->getMessage(),
-            ]);
+        } catch (MarzPayException $e) {
+            Log::error('Withdrawal failed', ['id' => $withdrawal->id, 'message' => $e->getMessage()]);
+            $withdrawal->update(['status' => 'failed', 'failure_reason' => $e->getMessage()]);
 
             $raw = strtolower($e->getMessage());
-            $message = 'Withdrawal could not be processed. Please try again later.';
+            $message = str_contains($raw, 'timed out') || str_contains($raw, 'connect')
+                ? 'Our payment provider is currently unreachable. Try again later.'
+                : 'Withdrawal could not be processed. Please try again.';
 
-            if (str_contains($raw, 'timed out') || str_contains($raw, 'could not connect')) {
-                $message = 'Our payment provider is currently unreachable. Please try again in a few minutes.';
-            } elseif (str_contains($raw, 'insufficient balance')) {
-                $message = 'The payout wallet does not have enough balance to complete this withdrawal.';
-            }
-
-            throw ValidationException::withMessages([
-                'amount' => [$message],
-            ]);
+            throw ValidationException::withMessages(['amount' => [$message]]);
         }
 
         return $withdrawal->fresh();
@@ -117,29 +80,21 @@ class WithdrawalService
 
     public function handleWebhook(array $payload): void
     {
-        $reference = $payload['reference'] ?? $payload['data']['reference'] ?? null;
-        $status    = $payload['status'] ?? $payload['data']['status'] ?? null;
+        $inner = $payload['data'] ?? $payload;
+        $reference = $inner['transaction']['reference'] ?? null;
+        $status = $inner['transaction']['status'] ?? null;
 
-        if (! $reference) {
-            return;
-        }
+        if (! $reference) return;
 
         $withdrawal = Withdrawal::where('marzpay_reference', $reference)->first();
+        if (! $withdrawal || in_array($withdrawal->status, ['successful', 'failed'], true)) return;
 
-        if (! $withdrawal) {
-            return;
-        }
-
-        if (in_array($withdrawal->status, ['successful', 'failed'], true)) {
-            return;
-        }
-
-        $isSuccess = in_array($status, ['successful', 'success', 'completed'], true);
+        $isSuccess = in_array($status, ['successful', 'completed'], true) || ($inner['event_type'] ?? null) === 'disbursement.completed';
 
         $withdrawal->update([
-            'status'         => $isSuccess ? 'successful' : 'failed',
-            'failure_reason' => $isSuccess ? null : ($payload['message'] ?? $payload['data']['message'] ?? null),
-            'raw_payload'    => $payload,
+            'status' => $isSuccess ? 'successful' : 'failed',
+            'failure_reason' => $isSuccess ? null : ($inner['transaction']['description'] ?? 'Payout failed.'),
+            'raw_payload' => $payload,
         ]);
     }
 }

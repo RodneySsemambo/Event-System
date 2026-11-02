@@ -10,6 +10,7 @@ use App\Notifications\BookingCreated;
 use App\Notifications\BookingDeclined;
 use App\Notifications\PaymentFailed;
 use App\Notifications\PaymentSuccessful;
+use App\Notifications\WelcomeUser;
 
 /**
  * Notification service holds the logic for notification that is sent t the user after any booking is made 
