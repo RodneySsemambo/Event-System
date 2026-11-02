@@ -18,6 +18,13 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
 
+    api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
     api
       .get('/api/me')
       .then((res) => {

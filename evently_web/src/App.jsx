@@ -12,6 +12,7 @@ import MyBookings from "./pages/MyBookings";
 import BookingRequestPage from './pages/BookingRequestPage';
 import NotificationsPage from './pages/NotificationsPage';
 import ProviderEarnings from './pages/ProviderEarnings';
+import AuthCallback from './pages/AuthCallback';
 import Legal from './pages/Legal';
 import Favorites from './pages/Favorites';
 export default function App() {
@@ -26,7 +27,7 @@ export default function App() {
           <Route path="/search" element={<Search />} />
           <Route path="/providers/:id" element={<ProviderPublicProfile />} />
           <Route path="/legal" element={<Legal />} /> 
-
+<Route path="/auth/callback" element={<AuthCallback />} />
           {/* Protected — any logged-in user */}
         <Route element={<ProtectedRoute />}>
   <Route path="/dashboard" element={<Dashboard />} />

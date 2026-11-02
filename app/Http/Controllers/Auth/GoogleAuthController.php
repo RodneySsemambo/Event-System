@@ -60,7 +60,10 @@ class GoogleAuthController extends Controller
         // This is the key line: log them into the SAME session Sanctum uses
         Auth::login($user, remember: true);
         request()->session()->regenerate();
+        $token = $user->createToken('google-oauth')->plainTextToken;
 
-        return redirect("{$frontend}/dashboard");
+        return redirect("{$frontend}/auth/callback?token={$token}");
+
+        //return redirect("{$frontend}/dashboard");
     }
 }
