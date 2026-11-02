@@ -65,6 +65,7 @@ class AuthController extends Controller
 
         return response()->json([
             'user' => $this->userPayload($user),
+            'token' => $token,
         ], 201);
     }
 
