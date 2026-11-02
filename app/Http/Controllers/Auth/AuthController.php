@@ -61,6 +61,8 @@ class AuthController extends Controller
         $request->session()->regenerate();
         $user->notify(new WelcomeUser($user));
 
+        $token = $user->createToken('auth-token')->plainTextToken;
+
         return response()->json([
             'user' => $this->userPayload($user),
         ], 201);
@@ -81,16 +83,26 @@ class AuthController extends Controller
         }
 
         $request->session()->regenerate();
+        $user = Auth::user();
+
+        // Create a Sanctum token
+        $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
-            'user' => $this->userPayload(Auth::user()),
+            'user' => $this->userPayload($user),
+            'token' => $token, // <--- Return the token
         ]);
     }
 
     public function logout(Request $request)
     {
-        Auth::guard('web')->logout();
+        // Revoke the current Sanctum token (for Bearer auth)
+        if ($request->user() && $request->user()->currentAccessToken()) {
+            $request->user()->currentAccessToken()->delete();
+        }
 
+        // Also logout the web guard (for session auth)
+        Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

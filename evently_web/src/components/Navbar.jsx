@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import NotificationBell from './NotificationBell';
 import './Navbar.css';
@@ -9,6 +9,7 @@ export default function Navbar({ forceSolid = false }) {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(forceSolid);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { navigate } = useNavigate();
 
   useEffect(() => {
     if (forceSolid) return;
@@ -33,6 +34,7 @@ export default function Navbar({ forceSolid = false }) {
   async function handleLogout() {
     setMenuOpen(false);
     await logout();
+    navigate('/login', { replace: true });
   }
 
   return (
@@ -76,7 +78,9 @@ export default function Navbar({ forceSolid = false }) {
                 <Link to="/dashboard" className="nav__user" title="Dashboard">
                   Hi, {user.name.split(' ')[0]}
                 </Link>
-                <button className="nav__btn nav__btn--ghost" onClick={handleLogout}>Log out</button>
+                  <button className="nav__btn nav__btn--ghost" onClick={handleLogout}>
+        Log out
+      </button>
               </>
             ) : (
               <>
@@ -145,13 +149,13 @@ export default function Navbar({ forceSolid = false }) {
 )}
             <Link to="/bookings" className="nav__drawer-link">Bookings</Link>
             <Link to="/" className="nav__drawer-link">Home</Link>
-            <button
-              type="button"
-              className="nav__drawer-link nav__drawer-link--danger"
-              onClick={handleLogout}
-            >
-              Log out
-            </button>
+           <button
+        type="button"
+        className="nav__drawer-link nav__drawer-link--danger"
+        onClick={handleLogout}
+      >
+        Log out
+      </button>
           </>
         ) : (
           <>

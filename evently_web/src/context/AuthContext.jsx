@@ -43,27 +43,33 @@ export function AuthProvider({ children }) {
   }, []);
 
   const register = useCallback(async (payload) => {
-    await ensureCsrfCookie();
-    const res = await api.post('/api/register', payload);
-    setUser(res.data.user);
-    return res.data.user;
-  }, []);
+  await ensureCsrfCookie();
+  const res = await api.post('/api/register', payload);
+  localStorage.setItem('auth_token', res.data.token); // Store token
+  setUser(res.data.user);
+  return res.data.user;
+}, []);
 
  const login = useCallback(async (email, password) => {
-  await ensureCsrfCookie();
-  const res = await api.post('/api/login', {
-    email,
-    password,
-    
-  });
+  await ensureCsrfCookie(); // Keep this for local dev
+  const res = await api.post('/api/login', { email, password });
+  localStorage.setItem('auth_token', res.data.token); // Store token
   setUser(res.data.user);
   return res.data.user;
 }, []);
 
   const logout = useCallback(async () => {
+  try {
     await api.post('/api/logout');
+  } catch (err) {
+    // Ignore errors — we're logging out anyway
+    console.warn('Logout request failed:', err.message);
+  } finally {
+    // Always clear local state, even if the API call fails
+    localStorage.removeItem('auth_token');
     setUser(null);
-  }, []);
+  }
+}, []);
 
   return (
     <AuthContext.Provider value={{ user, loading, register, login, logout, refreshUser }}>
