@@ -8,6 +8,7 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\ClientProfile;
 use App\Models\ProviderProfile;
 use App\Models\User;
+use App\Notifications\WelcomeUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -58,6 +59,7 @@ class AuthController extends Controller
 
         Auth::login($user);
         $request->session()->regenerate();
+        $user->notify(new WelcomeUser($user));
 
         return response()->json([
             'user' => $this->userPayload($user),

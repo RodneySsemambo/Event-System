@@ -42,4 +42,8 @@ class NotificationService
     {
         $client->notify(new BookingCompleted($booking));
     }
+    public function welcome(User $user)
+    {
+        $user->notify(new WelcomeUser($user));
+    }
 }
