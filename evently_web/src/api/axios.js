@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-// In dev, Vite proxies /api and /sanctum to http://localhost:8000, so
-// requests use relative URLs and are same-origin — cookies just work.
-// In production (same domain), relative URLs also work.
+// Use the environment variable in production, and the local URL in development
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 const api = axios.create({
-  baseURL: '', // relative — Vite proxy handles the rest
+  baseURL,
   withCredentials: true,
   withXSRFToken: true,
   headers: {
@@ -13,7 +13,8 @@ const api = axios.create({
 });
 
 export async function ensureCsrfCookie() {
-  await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
+  // Also use the baseURL here so the CSRF cookie comes from Render, not Vercel
+  await axios.get(`${baseURL}/sanctum/csrf-cookie`, { withCredentials: true });
 }
 
 export default api;
