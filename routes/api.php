@@ -22,6 +22,19 @@ use App\Services\PaymentService;
 use Illuminate\Support\Facades\DB;
 
 // --- Public / guest ------------------------------------------------------
+
+Route::get('/send-test-mail', function (\Illuminate\Http\Request $request) {
+    if ($request->query('secret') !== env('QUEUE_SECRET')) abort(403);
+
+    try {
+        \Illuminate\Support\Facades\Mail::raw('This is a test email from Evently on Render.', function ($msg) {
+            $msg->to('ssemamborodney94@gmail.com')->subject('Evently Test Email');
+        });
+        return response()->json(['status' => 'Email sent successfully!']);
+    } catch (\Throwable $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
 Route::get('/inspect-bookings', function (\Illuminate\Http\Request $request) {
     if ($request->query('secret') !== env('QUEUE_SECRET')) {
         return response()->json(['error' => 'Unauthorized'], 403);
@@ -113,15 +126,20 @@ Route::get('/run-queue', function (\Illuminate\Http\Request $request) {
 });
 
 Route::get('/check-jobs', function (\Illuminate\Http\Request $request) {
-    if ($request->query('secret') !== env('QUEUE_SECRET')) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
+    if ($request->query('secret') !== env('QUEUE_SECRET')) abort(403);
 
-    return response()->json([
-        'pending' => DB::table('jobs')->count(),
-        'failed'  => DB::table('failed_jobs')->count(),
-        'recent'  => DB::table('failed_jobs')->latest()->take(3)->get(['exception', 'failed_at']),
-    ]);
+    try {
+        return response()->json([
+            'pending' => \Illuminate\Support\Facades\DB::table('jobs')->count() ?? 0,
+            'failed'  => \Illuminate\Support\Facades\DB::table('failed_jobs')->count() ?? 0,
+            'recent'  => \Illuminate\Support\Facades\DB::table('failed_jobs')->latest()->take(3)->get(['exception', 'failed_at']) ?? [],
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'error' => 'Database tables not found. Run migrations.',
+            'details' => $e->getMessage()
+        ]);
+    }
 });
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

@@ -25,4 +25,3 @@ php /var/www/html/artisan view:cache
 echo "Starting services..."
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
 php /var/www/html/artisan storage:link
-RUN chmod -R 775 /var/www/html/public
