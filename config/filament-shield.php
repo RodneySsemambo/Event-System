@@ -1,6 +1,11 @@
 <?php
 
 declare(strict_types=1);
+
+use App\Policies\BookingPolicy;
+use App\Policies\PaymentPolicy;
+use App\Policies\ProviderProfilePolicy;
+use App\Policies\WithdrawalPolicy;
 use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
 use Filament\Pages\Dashboard;
 use Filament\Widgets\AccountWidget;
@@ -143,8 +148,18 @@ return [
         'merge' => true,
         'generate' => true,
         'methods' => [
-            'viewAny', 'view', 'create', 'update', 'delete', 'deleteAny', 'restore',
-            'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
+            'viewAny',
+            'view',
+            'create',
+            'update',
+            'delete',
+            'deleteAny',
+            'restore',
+            'forceDelete',
+            'forceDeleteAny',
+            'restoreAny',
+            'replicate',
+            'reorder',
         ],
         'single_parameter_methods' => [
             'viewAny',
@@ -269,6 +284,15 @@ return [
         'discover_all_resources' => false,
         'discover_all_widgets' => false,
         'discover_all_pages' => false,
+    ],
+
+    'ignored_policies' => [
+        ProviderProfilePolicy::class,
+        BookingPolicy::class,
+        PaymentPolicy::class,
+        WithdrawalPolicy::class,
+
+
     ],
 
     /*
