@@ -11,17 +11,17 @@ const api = axios.create({
   },
 });
 
-// Interceptor to attach the Bearer token to every request
+// Attach the Bearer token to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('auth_token');
-  if (token) {
+  if (token && token !== 'undefined') {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
+// Keep this export so AuthContext doesn't break
 export async function ensureCsrfCookie() {
-  // Only needed if we rely on session cookies (local dev), but safe to keep
   await axios.get(`${baseURL}/sanctum/csrf-cookie`, { withCredentials: true });
 }
 
