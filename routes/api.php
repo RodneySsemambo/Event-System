@@ -22,6 +22,34 @@ use App\Services\PaymentService;
 use Illuminate\Support\Facades\DB;
 
 // --- Public / guest ------------------------------------------------------
+Route::get('/inspect-bookings', function (\Illuminate\Http\Request $request) {
+    if ($request->query('secret') !== env('QUEUE_SECRET')) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    $bookings = \App\Models\Booking::with('payment')
+        ->latest()
+        ->take(10)
+        ->get()
+        ->map(function ($b) {
+            return [
+                'id'                => $b->id,
+                'status'            => $b->status,
+                'quoted_amount'     => $b->quoted_amount,
+                'provider_payout'   => $b->provider_payout,
+                'payment_status'    => $b->payment?->status,
+                'payment_reference' => $b->payment?->marzpay_reference,
+                'created_at'        => $b->created_at,
+            ];
+        });
+
+    return response()->json([
+        'total_bookings'      => \App\Models\Booking::count(),
+        'completed_bookings'  => \App\Models\Booking::where('status', 'completed')->count(),
+        'null_payout_count'   => \App\Models\Booking::where('status', 'completed')->whereNull('provider_payout')->count(),
+        'bookings'            => $bookings,
+    ]);
+});
 Route::get('/ping', function () {
     return response()->json(['pong' => true, 'time' => now()]);
 });
