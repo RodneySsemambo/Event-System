@@ -19,6 +19,8 @@ use App\Http\Controllers\WithdrawalController;
 
 use App\Models\Booking;
 use App\Services\PaymentService;
+use Illuminate\Support\Facades\DB;
+
 // --- Public / guest ------------------------------------------------------
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -82,6 +84,15 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(['backfilled' => $count, 'time' => now()]);
     });
 
+    // Add to routes/api.php
+    Route::get('/check-jobs', function (\Illuminate\Http\Request $request) {
+        if ($request->query('secret') !== env('QUEUE_SECRET')) abort(403);
+        return response()->json([
+            'pending' => DB::table('jobs')->count(),
+            'failed'  => DB::table('failed_jobs')->count(),
+            'recent'  => DB::table('failed_jobs')->latest()->take(3)->get(['exception', 'failed_at']),
+        ]);
+    });
     // Bookings: creation is client-only, everything else is guarded by
     // BookingPolicy (per-action, not per-route — status update/cancel/
     // complete each have different ownership + state rules).
