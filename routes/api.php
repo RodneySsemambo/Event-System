@@ -60,6 +60,28 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
+    Route::get('/run-backfill', function (\Illuminate\Http\Request $request) {
+        if ($request->query('secret') !== env('QUEUE_SECRET')) {
+            abort(403);
+        }
+
+        $count = 0;
+        \App\Models\Booking::where('status', 'completed')
+            ->whereNull('provider_payout')
+            ->each(function ($b) use (&$count) {
+                $price = $b->quoted_amount ?? $b->providerProfile->price_range_min ?? 0;
+                $commission = round($price * 0.10, 2);
+                $b->update([
+                    'quoted_amount'     => $price,
+                    'commission_amount' => $commission,
+                    'provider_payout'   => round($price - $commission, 2),
+                ]);
+                $count++;
+            });
+
+        return response()->json(['backfilled' => $count, 'time' => now()]);
+    });
+
     // Bookings: creation is client-only, everything else is guarded by
     // BookingPolicy (per-action, not per-route — status update/cancel/
     // complete each have different ownership + state rules).
