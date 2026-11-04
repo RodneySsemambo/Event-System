@@ -10,7 +10,6 @@ class ProviderProfilePolicy
 {
     use HandlesAuthorization;
 
-    // Super admins bypass everything
     public function before(User $user): ?bool
     {
         if ($user->hasRole('super_admin') || $user->role === 'admin') {
@@ -21,12 +20,12 @@ class ProviderProfilePolicy
 
     public function view(User $user, ProviderProfile $providerProfile): bool
     {
-        return true; // Public profiles can be viewed by anyone
+        return true;
     }
 
     public function update(User $user, ProviderProfile $providerProfile): bool
     {
-        // Only the owner of this provider profile can edit it
+        // This is the critical line: the owner can update their profile
         return $user->id === $providerProfile->user_id;
     }
 
