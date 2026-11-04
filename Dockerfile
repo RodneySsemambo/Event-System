@@ -14,6 +14,7 @@ RUN composer install --no-dev --no-interaction --no-plugins --no-scripts --prefe
 FROM php:8.3-fpm-alpine
 
 RUN apk add --no-cache nginx supervisor curl
+
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 RUN chmod +x /usr/local/bin/install-php-extensions && \
     install-php-extensions intl zip gd pdo_pgsql pdo_mysql bcmath opcache exif pcntl
@@ -27,9 +28,10 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/start.sh /usr/local/bin/start.sh
 
-RUN chmod +x /usr/local/bin/start.sh
+# All chmods happen during build, before CMD
+RUN chmod +x /usr/local/bin/start.sh && \
+    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
 
 EXPOSE 80
 
 CMD ["/usr/local/bin/start.sh"]
-RUN chmod -R 775 /var/www/html/public
