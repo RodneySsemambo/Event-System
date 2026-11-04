@@ -22,6 +22,9 @@ use App\Services\PaymentService;
 use Illuminate\Support\Facades\DB;
 
 // --- Public / guest ------------------------------------------------------
+Route::get('/ping', function () {
+    return response()->json(['pong' => true, 'time' => now()]);
+});
 
 Route::get('/run-queue', function (\Illuminate\Http\Request $request) {
     if ($request->query('secret') !== env('QUEUE_SECRET')) abort(403);
