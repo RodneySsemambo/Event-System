@@ -26,31 +26,69 @@ Route::get('/ping', function () {
     return response()->json(['pong' => true, 'time' => now()]);
 });
 
-Route::get('/run-queue', function (\Illuminate\Http\Request $request) {
-    if ($request->query('secret') !== env('QUEUE_SECRET')) abort(403);
-    \Illuminate\Support\Facades\Artisan::call('queue:work', ['--stop-when-empty' => true]);
-    return response()->json(['status' => 'processed', 'time' => now()]);
+Route::get('/run-backfill', function (\Illuminate\Http\Request $request) {
+    Log::info('run-backfill hit', ['has_secret' => $request->has('secret')]);
+
+    if ($request->query('secret') !== env('QUEUE_SECRET')) {
+        return response()->json([
+            'error'  => 'Unauthorized',
+            'reason' => 'Secret mismatch or QUEUE_SECRET is not set on Render',
+            'got'    => $request->query('secret'),
+        ], 403);
+    }
+
+    try {
+        $count = 0;
+        \App\Models\Booking::where('status', 'completed')
+            ->whereNull('provider_payout')
+            ->each(function ($b) use (&$count) {
+                $price = (float) ($b->quoted_amount ?? $b->providerProfile?->price_range_min ?? 0);
+                $commission = round($price * 0.10, 2);
+                $b->update([
+                    'quoted_amount'     => $price,
+                    'commission_amount' => $commission,
+                    'provider_payout'   => round($price - $commission, 2),
+                ]);
+                $count++;
+            });
+
+        return response()->json(['backfilled' => $count, 'time' => now()]);
+    } catch (\Throwable $e) {
+        Log::error('run-backfill failed', [
+            'error' => $e->getMessage(),
+            'class' => get_class($e),
+        ]);
+        return response()->json([
+            'error' => $e->getMessage(),
+            'class' => get_class($e),
+            'file'  => $e->getFile(),
+            'line'  => $e->getLine(),
+        ], 500);
+    }
 });
 
-Route::get('/run-backfill', function (\Illuminate\Http\Request $request) {
-    if ($request->query('secret') !== env('QUEUE_SECRET')) abort(403);
-    $count = 0;
-    \App\Models\Booking::where('status', 'completed')->whereNull('provider_payout')
-        ->each(function ($b) use (&$count) {
-            $price = $b->quoted_amount ?? $b->providerProfile->price_range_min ?? 0;
-            $commission = round($price * 0.10, 2);
-            $b->update([
-                'quoted_amount'     => $price,
-                'commission_amount' => $commission,
-                'provider_payout'   => round($price - $commission, 2),
-            ]);
-            $count++;
-        });
-    return response()->json(['backfilled' => $count, 'time' => now()]);
+Route::get('/run-queue', function (\Illuminate\Http\Request $request) {
+    if ($request->query('secret') !== env('QUEUE_SECRET')) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    try {
+        \Illuminate\Support\Facades\Artisan::call('queue:work', ['--stop-when-empty' => true]);
+        return response()->json([
+            'status'  => 'processed',
+            'output'  => \Illuminate\Support\Facades\Artisan::output(),
+            'time'    => now(),
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
 });
 
 Route::get('/check-jobs', function (\Illuminate\Http\Request $request) {
-    if ($request->query('secret') !== env('QUEUE_SECRET')) abort(403);
+    if ($request->query('secret') !== env('QUEUE_SECRET')) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
     return response()->json([
         'pending' => DB::table('jobs')->count(),
         'failed'  => DB::table('failed_jobs')->count(),
