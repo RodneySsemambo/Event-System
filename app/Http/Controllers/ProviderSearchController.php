@@ -30,7 +30,6 @@ class ProviderSearchController extends Controller
         ]);
 
         $query = ProviderProfile::query()
-            ->verified()
             ->withAvg('reviews', 'rating')
             ->with('category')
             ->withCount('reviews');
