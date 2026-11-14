@@ -21,4 +21,9 @@ class PortfolioItem extends Model
     {
         return $this->belongsTo(ProviderProfile::class);
     }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }
