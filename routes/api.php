@@ -40,7 +40,8 @@ Route::get('/send-test-mail', function (\Illuminate\Http\Request $request) {
         });
         return response()->json(['status' => 'Email sent successfully!']);
     } catch (\Throwable $e) {
-        return response()->json(['error' => $   e->getMessage()], 500);
+        // REMOVED THE EXTRA SPACES HERE: $e instead of $   e
+        return response()->json(['error' => $e->getMessage()], 500);
     }
 });
 Route::get('/inspect-bookings', function (\Illuminate\Http\Request $request) {
