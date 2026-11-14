@@ -5,6 +5,7 @@ import api from '../api/axios';
 import './Showcase.css';
 
 const AUTOPLAY_MS = 5000;
+const STORAGE_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export default function Showcase() {
   const trackRef = useRef(null);
@@ -15,8 +16,14 @@ export default function Showcase() {
 
   useEffect(() => {
     api.get('/api/showcase')
-      .then((res) => setSlides(res.data || []))
-      .catch(() => setSlides([]))
+      .then((res) => {
+        console.log('Showcase data from API:', res.data); // Debugging line
+        setSlides(res.data || []);
+      })
+      .catch((err) => {
+        console.error('Showcase API failed:', err);
+        setSlides([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -63,7 +70,6 @@ export default function Showcase() {
     track.scrollBy({ left: direction * step, behavior: 'smooth' });
   }
 
-  // Hide the whole section if there's nothing to show
   if (!loading && slides.length === 0) return null;
 
   return (
@@ -75,18 +81,8 @@ export default function Showcase() {
             <h2 className="showcase__heading">Real events, real providers.</h2>
           </div>
           <div className="showcase__nav">
-            <button
-              type="button"
-              className="showcase__nav-btn"
-              onClick={() => scrollBy(-1)}
-              aria-label="Previous"
-            >←</button>
-            <button
-              type="button"
-              className="showcase__nav-btn"
-              onClick={() => scrollBy(1)}
-              aria-label="Next"
-            >→</button>
+            <button type="button" className="showcase__nav-btn" onClick={() => scrollBy(-1)} aria-label="Previous">←</button>
+            <button type="button" className="showcase__nav-btn" onClick={() => scrollBy(1)} aria-label="Next">→</button>
           </div>
         </header>
 
@@ -106,16 +102,12 @@ export default function Showcase() {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
             {slides.map((s) => (
-              <Link
-                key={s.id}
-                to={`/providers/${s.provider.id}`}
-                className="showcase__slide"
-              >
+              <Link key={s.id} to={`/providers/${s.provider.id}`} className="showcase__slide">
                 <div className="showcase__media">
                   {s.media_type === 'video' ? (
-                    <video src={`/storage/${s.image_path}`} muted playsInline preload="metadata" />
+                    <video src={`${STORAGE_BASE}/storage/${s.image_path}`} muted playsInline preload="metadata" />
                   ) : (
-                    <img src={`/storage/${s.image_path}`} alt={s.caption || s.provider.business_name} loading="lazy" />
+                    <img src={`${STORAGE_BASE}/storage/${s.image_path}`} alt={s.caption || s.provider.business_name} loading="lazy" />
                   )}
                 </div>
                 <div className="showcase__caption">
