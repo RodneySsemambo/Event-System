@@ -22,7 +22,15 @@ use App\Services\PaymentService;
 use Illuminate\Support\Facades\DB;
 
 // --- Public / guest ------------------------------------------------------
+Route::get('/check-portfolio', function (\Illuminate\Http\Request $request) {
+    if ($request->query('secret') !== env('QUEUE_SECRET')) abort(403);
 
+    return response()->json([
+        'total_items' => \App\Models\PortfolioItem::count(),
+        'verified_providers' => \App\Models\ProviderProfile::where('verification_status', 'verified')->count(),
+        'items' => \App\Models\PortfolioItem::with('providerProfile:id,business_name,verification_status')->get(),
+    ]);
+});
 Route::get('/send-test-mail', function (\Illuminate\Http\Request $request) {
     if ($request->query('secret') !== env('QUEUE_SECRET')) abort(403);
 
