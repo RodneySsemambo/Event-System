@@ -70,6 +70,7 @@ export default function NotificationBell() {
     case 'booking_completed':   return `Booking completed: ${d.event_type}`;
     case 'payment_successful':  return `Payment received for booking #${d.booking_id}`;
     case 'payment_failed':      return `Payment failed for booking #${d.booking_id}`;
+    case 'welcome':         return d.message || 'Welcome to Evently!';
     default:                    return 'New notification';
   }
 }
