@@ -4,7 +4,7 @@ import './ImageTextSection.css';
 // Placeholder photo — Picsum's placeholder-image service (seeded, so it's
 // stable across reloads). Swap for real provider/event photography before
 // launch, same as the hero video.
-const PLACEHOLDER_IMAGE = 'https://picsum.photos/seed/evently-decor/900/720';
+const PLACEHOLDER_IMAGE = 'public/gallery/gallery-2.jpg';
 
 export default function ImageTextSection() {
   return (
