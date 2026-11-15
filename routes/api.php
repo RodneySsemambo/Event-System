@@ -22,6 +22,16 @@ use App\Services\PaymentService;
 use Illuminate\Support\Facades\DB;
 
 // --- Public / guest ------------------------------------------------------
+
+Route::get('/check-providers', function (\Illuminate\Http\Request $request) {
+    if ($request->query('secret') !== env('QUEUE_SECRET')) abort(403);
+
+    return response()->json([
+        'total_users' => \App\Models\User::count(),
+        'total_providers' => \App\Models\ProviderProfile::count(),
+        'providers' => \App\Models\ProviderProfile::with('user:id,name')->get(),
+    ]);
+});
 Route::get('/check-portfolio', function (\Illuminate\Http\Request $request) {
     if ($request->query('secret') !== env('QUEUE_SECRET')) abort(403);
 
