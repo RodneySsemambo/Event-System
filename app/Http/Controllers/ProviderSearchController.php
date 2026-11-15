@@ -72,7 +72,7 @@ class ProviderSearchController extends Controller
                     'profile_photo_path' => $provider->profile_photo_path,
                     'rating_avg' => $provider->reviews_avg_rating ? round($provider->reviews_avg_rating, 1) : null,
                     'rating_count' => $provider->reviews_count,
-                    'verification_status' => $provider->verification_status
+
                 ];
         });
 
