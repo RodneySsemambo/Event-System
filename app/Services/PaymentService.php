@@ -48,8 +48,11 @@ class PaymentService
         ]);
 
         try {
+            // Force the phone number to start with 256 (MarzPay usually requires this)
+            $formattedPhone = preg_replace('/^0/', '256', $phoneNumber);
+
             $response = MarzPay::collections()->collectMoney([
-                'phone_number' => $phoneNumber,
+                'phone_number' => $formattedPhone,
                 'amount'       => $amount,
                 'description'  => "Evently booking #{$booking->id}",
                 'country'      => 'UG',
@@ -60,15 +63,19 @@ class PaymentService
             $marzUuid      = $response['data']['transaction']['uuid'] ?? null;
 
             $payment->update(['marzpay_reference' => $marzReference, 'marzpay_uuid' => $marzUuid]);
+        } catch (\Throwable $e) { // <--- Changed from MarzPayException to \Throwable
+            Log::error('MarzPay collection failed', [
+                'booking_id' => $booking->id,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
-        } catch (MarzPayException $e) {
-            Log::error('MarzPay collection failed', ['booking_id' => $booking->id, 'message' => $e->getMessage()]);
             $payment->update(['status' => 'failed']);
 
             $detail = strtolower($e->getMessage());
-            $message = (str_contains($detail, 'balance') || str_contains($detail, 'insufficient')) 
+            $message = (str_contains($detail, 'balance') || str_contains($detail, 'insufficient'))
                 ? 'Your mobile money wallet does not have enough balance. Top up and try again.'
-                : 'Could not initiate payment. Please contact our customer support.';
+                : 'Could not start payment: ' . $e->getMessage(); // Show the real error!
 
             throw ValidationException::withMessages(['payment' => [$message]]);
         }
