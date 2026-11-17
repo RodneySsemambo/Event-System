@@ -77,7 +77,9 @@ class PaymentService
                 ? 'Your mobile money wallet does not have enough balance. Top up and try again.'
                 : 'Could not start payment: ' . $e->getMessage(); // Show the real error!
 
-            throw ValidationException::withMessages(['payment' => [$message]]);
+            throw ValidationException::withMessages([
+                'payment' => ['Payment error: ' . $e->getMessage()],
+            ]);
         }
 
         return $payment->fresh();
